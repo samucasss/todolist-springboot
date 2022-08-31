@@ -247,7 +247,8 @@ public class PreferenciasRestControllerTest {
 
     @Test
     public void testDeleteOk() {
-        testUtil.saveUsuario();
+        Usuario usuario = testUtil.saveUsuario();
+        savePreferencias(usuario);
         String token = testUtil.login("samuca@gmail.com");
 
         String url = "http://localhost:" + port + "/preferencia";
@@ -264,8 +265,27 @@ public class PreferenciasRestControllerTest {
     }
 
     @Test
-    public void testDeleteNaoAutenticado() {
+    public void testDeleteSemPreferencias() {
         testUtil.saveUsuario();
+        String token = testUtil.login("samuca@gmail.com");
+
+        String url = "http://localhost:" + port + "/preferencia";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+
+        HttpEntity request = new HttpEntity(headers);
+
+        ResponseEntity<String> result  = restTemplate.exchange(url, HttpMethod.DELETE, request,
+                String.class);
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
+    }
+
+    @Test
+    public void testDeleteNaoAutenticado() {
+        Usuario usuario = testUtil.saveUsuario();
+        savePreferencias(usuario);
         String url = "http://localhost:" + port + "/preferencia";
 
         HttpEntity request = new HttpEntity(null);

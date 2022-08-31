@@ -4,6 +4,7 @@ import com.samuca.todolist.dao.PreferenciasDao;
 import com.samuca.todolist.model.Preferencias;
 import com.samuca.todolist.model.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -42,13 +43,17 @@ public class PreferenciasRestController {
     }
 
     @DeleteMapping("/preferencia")
-    public String delete() {
+    public ResponseEntity<String> delete() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Usuario usuario = (Usuario) authentication.getPrincipal();
 
         Preferencias preferencias = preferenciasDao.findByUsuarioId(usuario.getId());
+        if (preferencias == null) {
+            return ResponseEntity.badRequest().body("Nao existe preferencias para o usuario");
+        }
+
         preferenciasDao.delete(preferencias);
 
-        return "OK";
+        return ResponseEntity.ok("OK");
     }
 }

@@ -5,6 +5,7 @@ import com.samuca.todolist.model.Tarefa;
 import com.samuca.todolist.model.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class TarefaRestController {
@@ -46,10 +48,15 @@ public class TarefaRestController {
     }
 
     @DeleteMapping("/tarefas/{id}")
-    public String delete(@PathVariable String id) {
-        Tarefa tarefa = tarefaDao.findById(id).get();
-        tarefaDao.delete(tarefa);
+    public ResponseEntity<String> delete(@PathVariable String id) {
+        Optional<Tarefa> optionalTarefa = tarefaDao.findById(id);
 
-        return "OK";
+        if (!optionalTarefa.isPresent()) {
+            return ResponseEntity.badRequest().body("Nao existe tarefa para o id " + id);
+        }
+
+        tarefaDao.delete(optionalTarefa.get());
+
+        return ResponseEntity.ok("OK");
     }
 }

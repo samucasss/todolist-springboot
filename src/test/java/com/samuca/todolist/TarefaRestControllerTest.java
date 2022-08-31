@@ -13,7 +13,6 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.*;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class TarefaRestControllerTest {
@@ -332,6 +331,24 @@ public class TarefaRestControllerTest {
                 String.class);
 
         Assertions.assertNotNull("OK", result.getBody());
+    }
+
+    @Test
+    public void testDeleteSemTarefa() {
+        testUtil.saveUsuario();
+        String token = testUtil.login("samuca@gmail.com");
+
+        String url = "http://localhost:" + port + "/tarefas/12345";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+
+        HttpEntity request = new HttpEntity(headers);
+
+        ResponseEntity<String> result  = restTemplate.exchange(url, HttpMethod.DELETE, request,
+                String.class);
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
     }
 
     @Test
